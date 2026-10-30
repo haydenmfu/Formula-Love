@@ -1,4 +1,4 @@
-# Cupid Lab
+# Formula:Love
 
 A personal prototype for drawing your own compatibility rules. This build is for feedback on the tree editor, not a live dating service. New users start with a blank tree; existing browser saves are preserved.
 

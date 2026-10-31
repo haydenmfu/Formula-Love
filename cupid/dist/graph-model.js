@@ -20,6 +20,7 @@ export function flowEdges(node){
   if(node.type==='terminal'||node.mode==='input')return [];
   if(node.type==='scale')return (node.ranges||[]).map((r,index)=>({label:rangeLabel(node,index),to:r.to,index}));
   if(node.type==='category')return (node.options||[]).map((r,index)=>({label:r.value,to:r.to,index}));
+  if(node.type==='text')return [{label:'Approved',to:node.yes,index:0},{label:'Not approved',to:node.no,index:1}];
   return [{label:'Yes',to:node.yes,index:0},{label:'No',to:node.no,index:1}];
 }
 // A number branch covers values from its breakpoint up to the next one; the first starts at the lowest allowed value.

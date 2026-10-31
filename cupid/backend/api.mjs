@@ -21,6 +21,11 @@ export function apiHandler(store){
  case 'PUT /api/rating':result=store.rate(id,body.targetId,body.score);break;
  case 'GET /api/matches':result=store.matches(id);break;
  case 'GET /api/progress':result=store.progress(id);break;
+ case 'GET /api/responses/sent':result=store.sentResponses(id);break;
+ case 'GET /api/responses/inbox':result=store.inbox(id);break;
+ case 'POST /api/responses/decide':result=store.decide(id,body.id,body.approve);break;
+ case 'POST /api/block':result=store.block(id,body.userId);break;
+ case 'POST /api/report':result=store.report(id,body.userId,body.reason);break;
  default:send(404,{error:'Unknown API route.'});return true;
  }send(200,result);
  }catch(e){send(e.status||500,{error:e.status?e.message:'Unable to complete request.'});if(!e.status)console.error(e);}

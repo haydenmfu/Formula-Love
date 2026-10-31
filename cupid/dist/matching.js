@@ -13,6 +13,7 @@ export function matchingFeed(profiles,user,skipped=new Set()){
    const clean={key:q.key,label:q.label,type:q.type};
    if(q.type==='scale'){clean.min=q.min??null;clean.max=q.max??null;clean.integer=!!q.integer;}
    if(q.type==='category')clean.options=q.options.map(o=>({value:o.value}));
+   // Open-ended prompts carry no options; the owner reviews the written response.
    questions.push(clean);
   }
  }

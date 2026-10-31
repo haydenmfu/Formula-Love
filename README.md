@@ -1,5 +1,9 @@
 # Cupid Lab
 
+## Connected SQL matching preview
+
+With Node **22.13+**, run `npm start` and open [Connected matching](http://127.0.0.1:4173/accounts.html). Restart an already running server after pulling backend updates. Create separate accounts, import exported trees, answer questions, and set test attraction ratings. SQLite persists reciprocal matches across restarts. The original editor remains browser-local; uploads are explicit. Photo support is not connected to accounts yet. See [backend details and API](cupid/backend/README.md).
+
 A personal prototype for drawing your own compatibility rules. This build is for feedback on the tree editor, not a live dating service. New users start with a blank tree; existing browser saves are preserved.
 
 ## Start on Windows or macOS

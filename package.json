@@ -1,1 +1,1 @@
-{"name":"cupid-lab","private":true,"engines":{"node":">=22"},"scripts":{"start":"node cupid/server.mjs --open","serve":"node cupid/server.mjs","test":"npm --prefix cupid test"}}
+{"name":"cupid-lab","private":true,"engines":{"node":">=22.13"},"scripts":{"start":"node cupid/server.mjs --open","serve":"node cupid/server.mjs","test":"npm --prefix cupid test"}}

@@ -1,13 +1,19 @@
 import http from 'node:http';
-import {readFile} from 'node:fs/promises';
+import {readFile,mkdir} from 'node:fs/promises';
+import {createStore} from './backend/store.mjs';
+import {apiHandler} from './backend/api.mjs';
 import {fileURLToPath} from 'node:url';
 import {extname,relative,resolve,sep} from 'node:path';
 import {spawn} from 'node:child_process';
 const root=fileURLToPath(new URL('./dist/',import.meta.url));
+await mkdir(new URL('./data/',import.meta.url),{recursive:true});
+const store=createStore(process.env.CUPID_DB||fileURLToPath(new URL('./data/cupid.sqlite',import.meta.url)));
+const api=apiHandler(store);
 const port=Number(process.env.PORT??4173);
 if(!Number.isInteger(port)||port<0||port>65535){console.error('PORT must be a number between 0 and 65535.');process.exit(1);}
 const types={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml'};
 const server=http.createServer(async(req,res)=>{
+  if(await api(req,res))return;
   if(!['GET','HEAD'].includes(req.method)){res.writeHead(405,{'Allow':'GET, HEAD'});return res.end('Method not allowed');}
   try{
     const path=decodeURIComponent(new URL(req.url,'http://localhost').pathname);

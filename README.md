@@ -1,10 +1,8 @@
-# Cupid Lab
+# Formula:Love
 
-## Connected SQL matching preview
+Design your own matchmaking algorithm. You build a tree of questions that decides who is compatible with you; your rules stay private.
 
-With Node **22.13+**, run `npm start` and open [Connected matching](http://127.0.0.1:4173/accounts.html). Restart an already running server after pulling backend updates. Create separate accounts, import exported trees, answer questions, and set test attraction ratings. SQLite persists reciprocal matches across restarts. The original editor remains browser-local; uploads are explicit. Photo support is not connected to accounts yet. See [backend details and API](cupid/backend/README.md).
-
-A personal prototype for drawing your own compatibility rules. This build is for feedback on the tree editor, not a live dating service. New users start with a blank tree; existing browser saves are preserved.
+A personal prototype, not a live dating service. With Node **22.13+**, run `npm start`, create an account, and build your tree. Accounts, trees, answers, ratings and matches are saved in a local SQLite database (`cupid/data/cupid.sqlite`). Everyone has a public profile (username and a preset picture); name, bio and hobbies are shown only after a mutual match. A tree saved in your browser before accounts existed is offered for one-click import. See [backend details and API](cupid/backend/README.md) and technical notes in `context.md`.
 
 ## Start on Windows or macOS
 
@@ -22,11 +20,11 @@ Alternatively, double-click **Start Cupid.cmd** on Windows. On macOS run `sh "St
 
 ## Build a tree
 
-Click **Add your first node**. Click a node to edit, drag dots to connect, scroll to zoom, and drag empty paper to pan. Scalar questions use From/To fields and destination dropdowns. Blue questions are binary, green questions scalar, and purple blocks combine answers. A two-of-three block takes binary questions; a Sum score block takes scalar questions.
+Sign in, then click **Add first node**. Click a node to edit, drag dots to connect, scroll to zoom, and drag empty paper to pan. Scalar questions use From/To fields and destination dropdowns. Blue questions are binary, green questions scalar, and purple blocks combine answers. A two-of-three block takes binary questions; a Sum score block takes scalar questions.
 
-**Clean up tree** rearranges the layout. **Clear tree** removes all nodes after confirmation; Undo restores the previous edit. **Export tree** saves your work as JSON; Advanced editor can import it.
+**Tidy layout** rearranges the layout. **Clear tree** removes all nodes after confirmation; Undo restores the previous edit. **Export tree** saves your work as JSON; Advanced editor can import it.
 
-Edits are local to the same browser and address (`http://127.0.0.1:4173/`). They are not uploaded or shared automatically. Export before clearing browser data. Exported rules may contain private preferences, so review them before sharing. Other tabs simulate two people and are not privacy boundaries.
+Your tree saves to your account on this server each time you edit it. **Export tree** downloads a JSON backup. Exported rules may contain private preferences, so review them before sharing.
 
 ## Feedback
 

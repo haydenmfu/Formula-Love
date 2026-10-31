@@ -20,6 +20,7 @@ export function apiHandler(store){
  case 'GET /api/candidates':result=store.candidates(id);break;
  case 'PUT /api/rating':result=store.rate(id,body.targetId,body.score);break;
  case 'GET /api/matches':result=store.matches(id);break;
+ case 'GET /api/progress':result=store.progress(id);break;
  default:send(404,{error:'Unknown API route.'});return true;
  }send(200,result);
  }catch(e){send(e.status||500,{error:e.status?e.message:'Unable to complete request.'});if(!e.status)console.error(e);}

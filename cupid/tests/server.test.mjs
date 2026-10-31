@@ -9,7 +9,7 @@ test('server starts outside project directory and serves only app files',async()
   const child=spawn(process.execPath,[script],{cwd:tmpdir(),env:{...process.env,PORT:'0',CUPID_DB:':memory:'},stdio:['ignore','pipe','pipe']});
   try{
     const url=await new Promise((resolve,reject)=>{let output='';const timer=setTimeout(()=>reject(Error('Startup timeout')),5000);child.stdout.on('data',c=>{output+=c;const match=output.match(/http:\/\/127\.0\.0\.1:\d+\//);if(match){clearTimeout(timer);resolve(match[0]);}});child.on('error',reject);});
-    assert.match(await (await fetch(url).catch(error=>{throw error.cause||error;})).text(),/Cupid/);
+    assert.match(await (await fetch(url).catch(error=>{throw error.cause||error;})).text(),/Formula:Love/);
     assert.match((await fetch(url+'editor.js')).headers.get('content-type'),/javascript/);
     assert.equal((await fetch(url+'README.md')).status,404);
     assert.equal((await fetch(url,{method:'POST'})).status,405);
@@ -21,6 +21,7 @@ test('server starts outside project directory and serves only app files',async()
     assert.equal((await fetch(url+'api/me',{headers})).status,200);
     assert.equal((await fetch(url+'api/profile',{method:'PUT',headers:{...headers,Origin:'https://unrelated.example'},body:'{}'})).status,403);
     assert.deepEqual(await (await fetch(url+'api/matches',{headers})).json(),[]);
+    assert.deepEqual(await (await fetch(url+'api/progress',{headers})).json(),{incoming:{passed:0,total:0},outgoing:{passed:0,total:0}});
     await fetch(url+'api/logout',{method:'POST',headers,body:'{}'});
     assert.equal((await fetch(url+'api/me',{headers})).status,401);
     const conflict=spawn(process.execPath,[script],{env:{...process.env,PORT:new URL(url).port},stdio:['ignore','ignore','pipe']});

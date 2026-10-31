@@ -24,10 +24,10 @@ const server=http.createServer(async(req,res)=>{
     res.end(req.method==='HEAD'?undefined:content);
   }catch{res.writeHead(404);res.end('Not found');}
 });
-server.on('error',error=>{console.error(error.code==='EADDRINUSE'?`Port ${port} is already in use. If Cupid is running, open http://127.0.0.1:${port}/. Otherwise stop the other server or set PORT to another number.`:error.message);process.exitCode=1;});
+server.on('error',error=>{console.error(error.code==='EADDRINUSE'?`Port ${port} is already in use. If Formula:Love is running, open http://127.0.0.1:${port}/. Otherwise stop the other server or set PORT to another number.`:error.message);process.exitCode=1;});
 server.listen(port,'127.0.0.1',()=>{
   const url=`http://127.0.0.1:${server.address().port}/`;
-  console.log(`Cupid ready at ${url}\nKeep this window open. Press Ctrl+C to stop.\nEdits stay in this browser. Export your tree to share or back it up.`);
+  console.log(`Formula:Love ready at ${url}\nKeep this window open. Press Ctrl+C to stop.\nAccounts and trees are saved in cupid/data/cupid.sqlite.`);
   if(process.argv.includes('--open')){
     const command=process.platform==='win32'?'rundll32.exe':process.platform==='darwin'?'open':'xdg-open';
     const child=spawn(command,process.platform==='win32'?['url.dll,FileProtocolHandler',url]:[url],{stdio:'ignore',windowsHide:true});

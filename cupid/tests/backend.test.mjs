@@ -23,3 +23,15 @@ test('SQL accounts create reciprocal matches, isolate answers, revoke and persis
  s.logout(a.token);assert.equal(s.authenticate(a.token),undefined);
  }finally{s.close();rmSync(dir,{recursive:true,force:true});}
 });
+test('accounts get a password identity, a public profile and server-side progress',()=>{
+ const s=createStore(':memory:');
+ try{
+ const a=s.register({username:'carol',password:'password-for-test'}),b=s.register({username:'dave_1',password:'another-password'});
+ assert.deepEqual(s.me(a.id).identities,['password']);
+ assert.equal(s.db.prepare('SELECT user_id FROM identities WHERE provider=? AND subject=?').get('password','carol').user_id,a.id);
+ assert.throws(()=>s.saveProfile(a.id,{avatar:'dragon'}));s.saveProfile(a.id,{avatar:'fox',privateHobbies:'hidden thing',bio:'match-only bio'});
+ const seen=s.candidates(b.id);assert.deepEqual(seen,[{id:a.id,username:'carol',avatar:'fox',score:null}]);
+ s.saveTree(a.id,structuredClone(tree));assert.deepEqual(s.progress(b.id).outgoing,{passed:0,total:1});
+ s.answer(b.id,s.questions(b.id)[0].token,true);assert.deepEqual(s.progress(b.id).outgoing,{passed:1,total:1});assert.deepEqual(s.progress(a.id).incoming,{passed:1,total:1});
+ }finally{s.close();}
+});

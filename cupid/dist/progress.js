@@ -16,8 +16,8 @@ export function treeProgress(tree,owner,candidate){
  const qualified=result.status==='match'||(result.status==='pending'&&total>0&&passed/total*100>=threshold);
  return {passed,total,qualified};
 }
+export const bestProgress=list=>list.reduce((a,b)=>b.passed>a.passed||(b.passed===a.passed&&b.total>0&&(a.total===0||b.total<a.total))?b:a,{passed:0,total:0});
 export function progressSummary(profiles,user){
- const best=list=>list.reduce((a,b)=>b.passed>a.passed||(b.passed===a.passed&&b.total>0&&(a.total===0||b.total<a.total))?b:a,{passed:0,total:0});
  const peers=profiles.filter(p=>p.id!==user.id);
- return {incoming:best(peers.map(p=>treeProgress(user.tree,user,p))),outgoing:best(peers.map(p=>treeProgress(p.tree,p,user)))};
+ return {incoming:bestProgress(peers.map(p=>treeProgress(user.tree,user,p))),outgoing:bestProgress(peers.map(p=>treeProgress(p.tree,p,user)))};
 }

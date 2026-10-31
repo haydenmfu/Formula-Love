@@ -157,3 +157,29 @@ dialog::backdrop{background:rgb(20 20 18 / .4)}
   .pagehead{flex-direction:column;align-items:flex-start;gap:12px}
   h1{font-size:23px}
 }
+
+/* Sign-in */
+.auth{max-width:400px;margin:0 auto;padding:12vh 20px 40px}
+.auth .brand{padding:0;margin-bottom:28px}
+.auth h1{margin-bottom:4px}
+.auth>p{margin-bottom:20px}
+.auth .card{margin-bottom:16px}
+.auth .card .primary{width:100%}
+.auth .error:empty{display:none}
+.auth .error{margin-bottom:12px}
+
+/* Profile pictures */
+.avatar-art{flex:none;border-radius:var(--r-sm);background:var(--surface-2);image-rendering:pixelated}
+.avatar-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.avatar-option{display:grid;justify-items:center;gap:4px;padding:8px 4px;border:1px solid var(--border);border-radius:var(--r-sm);font-size:12px;color:var(--muted);cursor:pointer}
+.avatar-option input{position:absolute;opacity:0;pointer-events:none}
+.avatar-option:hover{border-color:var(--border-strong)}
+.avatar-option:has(input:checked){border-color:var(--accent);background:var(--accent-soft);color:var(--text)}
+.avatar-option:has(input:focus-visible){outline:2px solid var(--focus);outline-offset:2px}
+.people{margin:0;padding:0;list-style:none}
+.people li{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.people li:last-child{border-bottom:0}
+.people li>strong{flex:1}
+.people li p{margin:2px 0 0}
+.people select{width:auto;padding:6px 8px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);font-size:13px}
+.notice button{height:26px;margin-left:6px;font-size:12px}

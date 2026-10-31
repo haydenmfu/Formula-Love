@@ -8,7 +8,7 @@ export function demoTree(){return {start:'kind',nodes:[
 {id:'hobbies',type:'hobbies',label:'Compatible hobbies?',yes:'connect',no:'friends',x:420,y:590},
 {id:'pass',type:'terminal',label:'Not a fit',outcome:'reject',x:750,y:225},
 {id:'friends',type:'terminal',label:'Better as friends',outcome:'friends',x:740,y:785},
-{id:'connect',type:'terminal',label:'Worth a conversation',outcome:'match',x:330,y:785}
+{id:'connect',type:'terminal',label:'End',outcome:'match',end:true,x:330,y:785}
 ]};}
 export function initialState({demo=false}={}){const tree=demo?demoTree():{start:"",nodes:[]};return {version:1,active:'you',profiles:[
 {id:'you',name:'You',bio:'Curious about people, terrible at small talk. Usually building something or finding a new game.',publicHobbies:'Programming, hiking, sci-fi books',privateHobbies:'League of Legends, board games',answers:{kind:true,exercise_hours:5,curious:true,funny:true,ambitious:true},tree:migrateTree(clone(tree))},

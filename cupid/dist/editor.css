@@ -134,3 +134,10 @@
 input.number-input{width:180px}
 .graph-node.open{--node-color:var(--accent)}
 .type-legend .open:before{background:var(--accent)}
+
+/* Start bubble and the End heart */
+.start-bubble{position:absolute;z-index:1;display:flex;align-items:center;height:34px;padding:0 22px 0 16px;border:1px solid var(--border-strong);border-radius:999px;background:var(--surface);box-shadow:0 1px 2px rgb(0 0 0 / .04);font-size:13px;font-weight:600}
+.start-bubble .port{position:absolute;right:-8px;top:50%;transform:translateY(-50%)}
+.graph-wires .start-line{stroke:var(--muted)}
+.graph-node.end-node{display:flex;flex-direction:column;align-items:center;gap:4px;width:96px;padding:12px 0 8px;border-radius:16px;font-size:12px;font-weight:600}
+.end-node .heart{width:40px;height:auto}

@@ -213,9 +213,9 @@ dialog::backdrop{background:rgb(20 20 18 / .4)}
 .step.passed::after{background:var(--accent)}
 .step.hidden::after{background:var(--text);opacity:.82}
 .goal{flex:none;width:30px}
-.heart{width:24px;height:auto;fill:var(--border-strong)}
-.heart.reached{fill:var(--accent)}
-.heart.faded{opacity:.4}
+.heart{width:24px;height:auto}
+.goal .heart:not(.reached){filter:grayscale(1);opacity:.45}
+.goal .heart.faded{opacity:.2}
 .marker{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);display:flex;filter:drop-shadow(0 1px 1px rgb(0 0 0 / .15))}
 .track.ended .marker{opacity:.55}
 .path-question{margin-top:12px;padding:14px 16px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--bg)}

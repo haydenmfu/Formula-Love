@@ -12,4 +12,6 @@ export const AVATARS={
 export const AVATAR_IDS=Object.keys(AVATARS);
 // Accounts without a chosen picture get a stable preset derived from their ID.
 export function avatarFor(avatar,seed=''){if(AVATARS[avatar])return avatar;let h=0;for(const c of String(seed))h=(h*31+c.charCodeAt(0))>>>0;return AVATAR_IDS[h%AVATAR_IDS.length];}
+const HEART={rows:['.bbb.bbb.','brrwbrrrb','brwwrrrrb','brwrrrrdb','.brrrrdb.','..brrdb..','...bdb...','....b....'],colors:{b:'#3b0c11',r:'#e2333f',w:'#ffffff',d:'#a8202b'}};
+export function heartSvg(cls=''){let px='';HEART.rows.forEach((row,y)=>[...row].forEach((c,x)=>{if(c!=='.')px+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${HEART.colors[c]}"/>`;}));return `<svg class="heart ${cls}" viewBox="0 0 9 8" shape-rendering="crispEdges" aria-hidden="true">${px}</svg>`;}
 export function avatarSvg(avatar,seed,size=28){const id=avatarFor(avatar,seed),{colors,rows}=AVATARS[id];let px='';rows.forEach((row,y)=>[...row].forEach((c,x)=>{if(c!=='.')px+=`<rect x="${x+1}" y="${y+1}" width="1" height="1" fill="${colors[c]}"/>`;}));return `<svg class="avatar-art" width="${size}" height="${size}" viewBox="0 0 10 10" shape-rendering="crispEdges" role="img" aria-label="${AVATARS[id].label}">${px}</svg>`;}

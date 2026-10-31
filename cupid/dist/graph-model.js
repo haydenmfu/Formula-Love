@@ -16,8 +16,19 @@ export function migrateTree(tree){
     });
     delete node.items;
   }
+  mergeEnds(tree);
   return tree;
 }
+// Older formulas could have several Compatible outcomes; they merge into one End and their branches follow.
+function mergeEnds(tree){
+  const ends=tree.nodes.filter(n=>n&&n.type==='terminal'&&n.outcome==='match');if(!ends.length)return;
+  const keep=ends.find(n=>n.end)||ends[0],gone=new Set(ends.filter(n=>n!==keep).map(n=>n.id));
+  Object.assign(keep,{end:true,label:'End'});if(!gone.size)return;
+  const to=id=>gone.has(id)?keep.id:id;
+  for(const n of tree.nodes){if(!n)continue;if('yes' in n)n.yes=to(n.yes);if('no' in n)n.no=to(n.no);for(const r of [...(Array.isArray(n.ranges)?n.ranges:[]),...(Array.isArray(n.options)?n.options:[])])if(r)r.to=to(r.to);}
+  tree.start=to(tree.start);tree.nodes=tree.nodes.filter(n=>!n||!gone.has(n.id));
+}
+export function addEnd(tree){if(tree.nodes.some(n=>n.end))return null;const x=Math.max(0,...tree.nodes.map(n=>n.x))+340,y=tree.nodes[0]?.y??80,id='end';tree.nodes.push({id,type:'terminal',outcome:'match',end:true,label:'End',x,y});return id;}
 export function flowEdges(node){
   if(node.type==='terminal'||node.mode==='input')return [];
   if(node.type==='scale')return (node.ranges||[]).map((r,index)=>({label:rangeLabel(node,index),to:r.to,index}));
@@ -79,7 +90,7 @@ export function layoutTree(tree,{heights={}}={}){
   const node=id=>tree.nodes.find(n=>n.id===id),gapY=40;
   const tall=id=>{const n=node(id);if(!n)return 40;return heights[id]||(['count','sum'].includes(n.type)?120+(n.inputs?.length||0)*65:80+22*flowEdges(n).length);};
   const columns=best.map(row=>row.map(tall)),span=h=>h.reduce((a,b)=>a+b,0)+gapY*Math.max(0,h.length-1),height=Math.max(...columns.map(span));
-  let x=60;
+  let x=190;
   best.forEach((row,r)=>{let y=60+(height-span(columns[r]))/2,widest=220;row.forEach((id,i)=>{const n=node(id);if(n){n.x=x;n.y=Math.round(y);if(['count','sum'].includes(n.type))widest=260;}y+=columns[r][i]+gapY;});x+=widest+100;});
   return {width:Math.max(1000,x+40),height:Math.max(600,height+160),crossings:score};
 }

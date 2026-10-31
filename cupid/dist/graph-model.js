@@ -1,7 +1,11 @@
 // Question values are data connections; yes/no and range branches are flow connections.
 export function inputsFor(node){return ['count','sum'].includes(node.type)?node.inputs||[]:[];}
 export function migrateTree(tree){
+  if(!tree||!Array.isArray(tree.nodes))return tree;
   for(const node of [...tree.nodes]){
+    if(!node||typeof node!=='object')continue;
+    // Number questions used to need integer ranges covering every value; branches now start at breakpoints.
+    if(node.type==='scale'&&Array.isArray(node.ranges)&&node.ranges.some(r=>r&&'min' in r)){node.ranges=[...node.ranges].sort((a,b)=>a.min-b.min).map((r,i)=>({from:i?r.min:null,to:r.to??''}));node.integer=true;}
     if(node.type!=='count'||!node.items)continue;
     node.inputs=node.items.map((item,i)=>{
       let id=node.id+'_input_'+(i+1);while(tree.nodes.some(n=>n.id===id))id+='_';
@@ -14,9 +18,17 @@ export function migrateTree(tree){
 }
 export function flowEdges(node){
   if(node.type==='terminal'||node.mode==='input')return [];
-  if(node.type==='scale')return (node.ranges||[]).map((r,index)=>({label:`${r.min}–${r.max}`,to:r.to,index}));
+  if(node.type==='scale')return (node.ranges||[]).map((r,index)=>({label:rangeLabel(node,index),to:r.to,index}));
   if(node.type==='category')return (node.options||[]).map((r,index)=>({label:r.value,to:r.to,index}));
   return [{label:'Yes',to:node.yes,index:0},{label:'No',to:node.no,index:1}];
+}
+// A number branch covers values from its breakpoint up to the next one; the first starts at the lowest allowed value.
+export function rangeLabel(node,index){
+  const r=node.ranges[index];if('min' in r)return `${r.min}–${r.max}`;
+  const lower=r.from??(Number.isFinite(node.min)?node.min:null),next=node.ranges[index+1]?.from,upper=next??(Number.isFinite(node.max)?node.max:null),last=next===undefined;
+  if(lower===null&&upper===null)return 'Any';
+  if(node.integer){const top=last?upper:upper-1;if(lower===null)return `${top} or less`;if(upper===null)return `${lower}+`;return lower===top?`${lower}`:`${lower}–${top}`;}
+  if(lower===null)return last?`${upper} or less`:`Under ${upper}`;if(upper===null)return `${lower}+`;return last?`${lower}–${upper}`:`${lower} to under ${upper}`;
 }
 export function connections(tree){
   return tree.nodes.flatMap(n=>[
@@ -60,8 +72,11 @@ export function layoutTree(tree,{heights={}}={}){
     layers.forEach((row,r)=>layers[r]=orderBranches(row,r));
     const next=crossings();if(next<=score){score=next;best=layers.map(l=>[...l]);}
   }
-  const width=Math.max(1000,...best.map(l=>l.length*280+100));
-  let y=60;
-  for(const row of best){let tallest=70;row.forEach((id,i)=>{const n=tree.nodes.find(n=>n.id===id);if(n){n.x=Math.round((width-row.length*280)/2+i*280);n.y=y;tallest=Math.max(tallest,heights[id]||(['count','sum'].includes(n.type)?120+(n.inputs?.length||0)*65:120));}});y+=tallest+55;}
-  return {width,height:Math.max(600,y+40),crossings:score};
+  // Layers become columns, left to right; each column is centred against the tallest one.
+  const node=id=>tree.nodes.find(n=>n.id===id),gapY=40;
+  const tall=id=>{const n=node(id);if(!n)return 40;return heights[id]||(['count','sum'].includes(n.type)?120+(n.inputs?.length||0)*65:80+22*flowEdges(n).length);};
+  const columns=best.map(row=>row.map(tall)),span=h=>h.reduce((a,b)=>a+b,0)+gapY*Math.max(0,h.length-1),height=Math.max(...columns.map(span));
+  let x=60;
+  best.forEach((row,r)=>{let y=60+(height-span(columns[r]))/2,widest=220;row.forEach((id,i)=>{const n=node(id);if(n){n.x=x;n.y=Math.round(y);if(['count','sum'].includes(n.type))widest=260;}y+=columns[r][i]+gapY;});x+=widest+100;});
+  return {width:Math.max(1000,x+40),height:Math.max(600,height+160),crossings:score};
 }

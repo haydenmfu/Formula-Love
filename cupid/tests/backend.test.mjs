@@ -35,3 +35,15 @@ test('accounts get a password identity, a public profile and server-side progres
  s.answer(b.id,s.questions(b.id)[0].token,true);assert.deepEqual(s.progress(b.id).outgoing,{passed:1,total:1});assert.deepEqual(s.progress(a.id).incoming,{passed:1,total:1});
  }finally{s.close();}
 });
+test('number questions accept typed decimals within limits and enforce whole numbers when asked',()=>{
+ const s=createStore(':memory:');
+ try{
+ const a=s.register({username:'erin',password:'password-for-test'}),b=s.register({username:'finn',password:'another-password'});
+ const hours={start:'h',nodes:[{id:'h',type:'scale',key:'hours',label:'How many hours a day do you work out?',min:0,max:24,ranges:[{from:null,to:'no'},{from:1,to:'yes'}],x:0,y:0},{id:'yes',type:'terminal',label:'Compatible',outcome:'match',x:300,y:0},{id:'no',type:'terminal',label:'Reject',outcome:'reject',x:300,y:120}]};
+ s.saveTree(a.id,structuredClone(hours));let q=s.questions(b.id)[0];assert.deepEqual([q.type,q.min,q.max,q.integer],['scale',0,24,false]);
+ for(const bad of [25,-1,'2',Infinity])assert.throws(()=>s.answer(b.id,q.token,bad));
+ s.answer(b.id,q.token,1.5);assert.deepEqual(s.progress(b.id).outgoing,{passed:1,total:1});
+ const whole=structuredClone(hours);whole.nodes[0].integer=true;s.saveTree(a.id,whole);q=s.questions(b.id)[0];assert.equal(q.integer,true);
+ assert.throws(()=>s.answer(b.id,q.token,1.5));s.answer(b.id,q.token,2);
+ }finally{s.close();}
+});

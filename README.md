@@ -20,7 +20,9 @@ Alternatively, double-click **Start Cupid.cmd** on Windows. On macOS run `sh "St
 
 ## Build a tree
 
-Sign in, then click **Add first node**. Click a node to edit, drag dots to connect, scroll to zoom, and drag empty paper to pan. Scalar questions use From/To fields and destination dropdowns. Blue questions are binary, green questions scalar, and purple blocks combine answers. A two-of-three block takes binary questions; a Sum score block takes scalar questions.
+Sign in, then click **Add first node**. Write each question to the person answering ("Do you play Valorant?", not "Does this person play Valorant?"). The editor flows left to right: a node's input is on its left edge and its branches run down its right edge. Click a node to edit, drag dots to connect, scroll to zoom, and drag empty paper to pan.
+
+Question types: **Yes / no** (blue), **Number** (green: they type any number; you set optional limits, whole-numbers-only, and branches that each start at a value), and **Multiple choice** (amber: one branch per choice). Purple blocks combine answers: at-least-N takes yes / no questions, Sum takes number questions. Trees made before this version are converted and rearranged left to right automatically.
 
 **Tidy layout** rearranges the layout. **Clear tree** removes all nodes after confirmation; Undo restores the previous edit. **Export tree** saves your work as JSON; Advanced editor can import it.
 

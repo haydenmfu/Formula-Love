@@ -1,22 +1,22 @@
-import {migrateTree,flowEdges,connections} from './graph-model.js';
-export const TYPES = {boolean:'Yes / no',scale:'Scalar ranges',category:'Category',count:'At least N',sum:'Sum score',hobbies:'Compatible hobbies',terminal:'Outcome'};
+import {migrateTree,flowEdges,connections,rangeLabel} from './graph-model.js';
+export const TYPES = {boolean:'Yes / no',scale:'Number',category:'Multiple choice',count:'At least N',sum:'Sum score',hobbies:'Compatible hobbies',terminal:'Outcome'};
 export const clone=x=>JSON.parse(JSON.stringify(x));
 export function demoTree(){return {start:'kind',nodes:[
-{id:'kind',type:'boolean',label:'Are they kind?',key:'kind',x:340,y:65,yes:'lifestyle',no:'pass'},
-{id:'lifestyle',type:'scale',label:'How active is their lifestyle?',key:'activity',min:1,max:10,ranges:[{min:1,max:3,to:'qualities'},{min:4,max:7,to:'hobbies'},{min:8,max:10,to:'hobbies'}],x:340,y:225},
-{id:'qualities',type:'count',label:'Two out of three works for me',items:[{key:'curious',label:'Curious'},{key:'funny',label:'Funny'},{key:'ambitious',label:'Ambitious'}],threshold:2,yes:'hobbies',no:'pass',x:70,y:420},
+{id:'kind',type:'boolean',label:'Would your friends call you kind?',key:'kind',x:340,y:65,yes:'lifestyle',no:'pass'},
+{id:'lifestyle',type:'scale',label:'How many hours a week do you exercise?',key:'exercise_hours',min:0,max:80,ranges:[{from:null,to:'qualities'},{from:3,to:'hobbies'},{from:8,to:'hobbies'}],x:340,y:225},
+{id:'qualities',type:'count',label:'Two out of three works for me',items:[{key:'curious',label:'Are you curious?'},{key:'funny',label:'Are you funny?'},{key:'ambitious',label:'Are you ambitious?'}],threshold:2,yes:'hobbies',no:'pass',x:70,y:420},
 {id:'hobbies',type:'hobbies',label:'Compatible hobbies?',yes:'connect',no:'friends',x:420,y:590},
 {id:'pass',type:'terminal',label:'Not a fit',outcome:'reject',x:750,y:225},
 {id:'friends',type:'terminal',label:'Better as friends',outcome:'friends',x:740,y:785},
 {id:'connect',type:'terminal',label:'Worth a conversation',outcome:'match',x:330,y:785}
 ]};}
 export function initialState({demo=false}={}){const tree=demo?demoTree():{start:"",nodes:[]};return {version:1,active:'you',profiles:[
-{id:'you',name:'You',bio:'Curious about people, terrible at small talk. Usually building something or finding a new game.',publicHobbies:'Programming, hiking, sci-fi books',privateHobbies:'League of Legends, board games',answers:{kind:true,activity:6,curious:true,funny:true,ambitious:true},attraction:{alex:8},tree:migrateTree(clone(tree))},
-{id:'alex',name:'Alex',bio:'Weekend trails, cooperative games, and an unreasonable number of unfinished side projects.',publicHobbies:'Trail walking, reading fantasy, cooking',privateHobbies:'LoL, tabletop games',answers:{kind:true,activity:3,curious:true,funny:true,ambitious:false},attraction:{you:7},tree:migrateTree(clone(tree))}
+{id:'you',name:'You',bio:'Curious about people, terrible at small talk. Usually building something or finding a new game.',publicHobbies:'Programming, hiking, sci-fi books',privateHobbies:'League of Legends, board games',answers:{kind:true,exercise_hours:5,curious:true,funny:true,ambitious:true},attraction:{alex:8},tree:migrateTree(clone(tree))},
+{id:'alex',name:'Alex',bio:'Weekend trails, cooperative games, and an unreasonable number of unfinished side projects.',publicHobbies:'Trail walking, reading fantasy, cooking',privateHobbies:'LoL, tabletop games',answers:{kind:true,exercise_hours:2.5,curious:true,funny:true,ambitious:false},attraction:{you:7},tree:migrateTree(clone(tree))}
 ]};}
 export const edges=flowEdges;
-export function validateTree(t,{allowUnconnected=false}={}){const e=[];if(t?.completionThreshold!==undefined&&(!Number.isInteger(t.completionThreshold)||t.completionThreshold<1||t.completionThreshold>100))return ['Completion threshold must be an integer from 1 to 100.'];if(allowUnconnected&&t&&Array.isArray(t.nodes)&&t.nodes.length===0&&t.start==='')return [];if(!t||!Array.isArray(t.nodes)||!t.nodes.length)return ['A tree needs at least one node.'];if(t.nodes.length>100)return ['Use at most 100 nodes in this prototype.'];const ids=new Set();for(const n of t.nodes){if(!n||typeof n.id!=='string'||!n.id){e.push('Every node needs a text ID.');continue}if(ids.has(n.id))e.push(`Duplicate ID: ${n.id}`);ids.add(n.id)}if(!ids.has(t.start))e.push('Choose an existing start node.');for(const n of t.nodes){if(!n||!TYPES[n.type]){e.push('Unknown node type.');continue}if(typeof n.label!=='string'||!n.label.trim())e.push(`${n.id}: add a label.`);if(!Number.isFinite(n.x)||!Number.isFinite(n.y)||n.x<0||n.y<0)e.push(`${n.id}: positions must be nonnegative numbers.`);if(['boolean','scale','category'].includes(n.type)&& (typeof n.key!=='string'||!n.key.trim()||['__proto__','constructor','prototype'].includes(n.key)))e.push(`${n.id}: add a valid answer key.`);
-if(n.type==='scale'){if(!Number.isInteger(n.min)||!Number.isInteger(n.max)||n.min>=n.max||n.max-n.min>100)e.push(`${n.id}: scalar limits must be integers, with a span of 1–100.`);if(!Array.isArray(n.ranges)||!n.ranges.length){e.push(`${n.id}: add scalar branches.`);continue}const sorted=[...n.ranges].sort((a,b)=>a.min-b.min);let next=n.min;for(const r of sorted){if(!Number.isInteger(r.min)||!Number.isInteger(r.max)||r.min!==next||r.max<r.min)e.push(`${n.id}: ranges must cover every integer exactly once.`);next=r.max+1}if(next!==n.max+1)e.push(`${n.id}: ranges must end at ${n.max}.`)}
+export function validateTree(t,{allowUnconnected=false}={}){const e=[];migrateTree(t);if(t?.completionThreshold!==undefined&&(!Number.isInteger(t.completionThreshold)||t.completionThreshold<1||t.completionThreshold>100))return ['Completion threshold must be an integer from 1 to 100.'];if(allowUnconnected&&t&&Array.isArray(t.nodes)&&t.nodes.length===0&&t.start==='')return [];if(!t||!Array.isArray(t.nodes)||!t.nodes.length)return ['A tree needs at least one node.'];if(t.nodes.length>100)return ['Use at most 100 nodes in this prototype.'];const ids=new Set();for(const n of t.nodes){if(!n||typeof n.id!=='string'||!n.id){e.push('Every node needs a text ID.');continue}if(ids.has(n.id))e.push(`Duplicate ID: ${n.id}`);ids.add(n.id)}if(!ids.has(t.start))e.push('Choose an existing start node.');for(const n of t.nodes){if(!n||!TYPES[n.type]){e.push('Unknown node type.');continue}if(typeof n.label!=='string'||!n.label.trim())e.push(`${n.id}: add a label.`);if(!Number.isFinite(n.x)||!Number.isFinite(n.y)||n.x<0||n.y<0)e.push(`${n.id}: positions must be nonnegative numbers.`);if(['boolean','scale','category'].includes(n.type)&& (typeof n.key!=='string'||!n.key.trim()||['__proto__','constructor','prototype'].includes(n.key)))e.push(`${n.id}: add a valid answer key.`);
+if(n.type==='scale'){const limit=v=>v==null||Number.isFinite(v),has=Number.isFinite;if(!limit(n.min)||!limit(n.max)||(has(n.min)&&has(n.max)&&n.min>=n.max))e.push(`${n.id}: answer limits must be numbers, with the minimum below the maximum.`);if(!Array.isArray(n.ranges)||!n.ranges.length){e.push(`${n.id}: add number branches.`);continue}if(n.ranges[0]?.from!==null)e.push(`${n.id}: the first branch must start at the lowest value.`);let prev=has(n.min)?n.min:-Infinity;for(const r of n.ranges.slice(1)){if(!has(r?.from)||r.from<=prev||(has(n.max)&&r.from>n.max)||(n.integer&&!Number.isInteger(r.from)))e.push(`${n.id}: each branch must start above the previous one${n.integer?', at a whole number':''}, within the answer limits.`);prev=r?.from}}
 if(n.type==='category'){if(!Array.isArray(n.options)||!n.options.length||n.options.some(o=>typeof o.value!=='string'||!o.value.trim())||new Set(n.options.map(o=>o.value)).size!==n.options.length){e.push(`${n.id}: add distinct category labels.`);continue}}
 if(['count','sum'].includes(n.type)){
   const type=n.type==='count'?'boolean':'scale';
@@ -53,17 +53,19 @@ else if(['count','sum'].includes(n.type)){
     detail=values.some(v=>v===null)?'Waiting for all scalar inputs.':values.join(' + ')+' = '+total+'; must be greater than '+n.threshold+'.';
   }
 }
-else {value=n.source==='attraction'?owner.attraction[candidate.id]:candidate.answers[n.key];if(n.type==='boolean'&&typeof value!=='boolean')value=null;if(n.type==='scale'&&(!Number.isInteger(value)||value<n.min||value>n.max))value=null;if(n.type==='category'&&!n.options.some(o=>o.value===value))value=null;}
+else {value=n.source==='attraction'?owner.attraction[candidate.id]:candidate.answers[n.key];if(n.type==='boolean'&&typeof value!=='boolean')value=null;if(n.type==='scale'&&!numberOk(n,value))value=null;if(n.type==='category'&&!n.options.some(o=>o.value===value))value=null;}
 if(value===undefined||value===null){trace.push({id:n.id,label:n.label,detail:detail||'Not answered yet.',pending:true});return {status:'pending',trace}}
-if(n.type==='scale'){const r=n.ranges.find(r=>value>=r.min&&value<=r.max);to=r.to;detail=`${value} / ${n.max} · branch ${r.min}–${r.max}${n.source==='attraction'?' · your appearance rating':''}`;}else if(n.type==='category'){to=n.options.find(o=>o.value===value).to;detail=value;}else{to=value?n.yes:n.no;detail=detail|| (value?'Yes':'No');}trace.push({id:n.id,label:n.label,detail,to});id=to;}
+if(n.type==='scale'){const i=n.ranges.findLastIndex(r=>r.from===null||value>=r.from);to=n.ranges[i].to;detail=`${value} · branch ${rangeLabel(n,i)}${n.source==='attraction'?' · your appearance rating':''}`;}else if(n.type==='category'){to=n.options.find(o=>o.value===value).to;detail=value;}else{to=value?n.yes:n.no;detail=detail|| (value?'Yes':'No');}trace.push({id:n.id,label:n.label,detail,to});id=to;}
 return {status:'invalid',trace,errors:['No outcome reached.']};}
 export function mutual(a,b){const forward=evaluate(a.tree,a,b),reverse=evaluate(b.tree,b,a);const attraction=Number(a.attraction[b.id])>=6&&Number(b.attraction[a.id])>=6;return {forward,reverse,attraction,matched:forward.status==='match'&&reverse.status==='match'&&attraction};}
 export function questionValue(n,owner,candidate){
  const v=n.source==='attraction'?owner.attraction[candidate.id]:candidate.answers[n.key];
  if(n.type==='boolean')return typeof v==='boolean'?v:null;
- if(n.type==='scale')return Number.isInteger(v)&&v>=n.min&&v<=n.max?v:null;
+ if(n.type==='scale')return numberOk(n,v)?v:null;
  return null;
 }
+// A number answer must be finite, whole when required, and inside any limits the owner set.
+export function numberOk(n,v){return Number.isFinite(v)&&(!n.integer||Number.isInteger(v))&&(!Number.isFinite(n.min)||v>=n.min)&&(!Number.isFinite(n.max)||v<=n.max);}
 export function questionsFor(owner,candidate){
  const result=evaluate(owner.tree,owner,candidate),last=result.status==='pending'?result.trace.at(-1):null;
  const blocked=owner.tree.nodes.find(n=>n.id===last?.id),needed=new Set(blocked?.inputs||[last?.id]);

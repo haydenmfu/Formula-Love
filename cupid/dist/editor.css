@@ -116,3 +116,19 @@
 .node-popup #add-range{margin-bottom:14px}
 
 @media(max-width:760px){.graph-scroll{height:480px}.editor-help{display:none}}
+
+/* Left-to-right flow: input on the left edge, branch outputs down the right edge,
+   a question's value output on its bottom edge for blocks below. */
+.graph-node.choice{--node-color:var(--choice)}
+.type-legend .choice:before{background:var(--choice)}
+.flow-in{position:absolute;left:-8px;top:50%;transform:translateY(-50%);z-index:2}
+.node-inputs{justify-content:space-around}
+.flow-outputs{flex-direction:column;justify-content:flex-start;gap:0;min-height:0;padding:4px 0 6px}
+.flow-outputs>div{position:relative;flex-direction:row;justify-content:flex-end;align-items:center;padding:3px 18px 3px 12px;text-align:right}
+.flow-outputs>div>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.flow-outputs .port{position:absolute;right:-8px;top:50%;margin:0;transform:translateY(-50%)}
+.value-row,.graph-node.scalar .value-row{top:auto;bottom:0;left:50%;right:auto}
+.value-row .port{left:-8px;right:auto;top:-8px}
+.range-start{align-self:center;font-size:12px;color:var(--muted)}
+.option-line{grid-template-columns:1fr auto}
+input.number-input{width:180px}

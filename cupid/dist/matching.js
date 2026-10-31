@@ -11,7 +11,7 @@ export function matchingFeed(profiles,user,skipped=new Set()){
   for(const q of questionsFor(owner,user).filter(q=>q.needed)){
    if(seen.has(q.key)||skipped.has(q.key))continue;seen.add(q.key);
    const clean={key:q.key,label:q.label,type:q.type};
-   if(q.type==='scale'){clean.min=q.min;clean.max=q.max;}
+   if(q.type==='scale'){clean.min=q.min??null;clean.max=q.max??null;clean.integer=!!q.integer;}
    if(q.type==='category')clean.options=q.options.map(o=>({value:o.value}));
    questions.push(clean);
   }

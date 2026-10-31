@@ -21,7 +21,9 @@ test('server starts outside project directory and serves only app files',async()
     assert.equal((await fetch(url+'api/me',{headers})).status,200);
     assert.equal((await fetch(url+'api/profile',{method:'PUT',headers:{...headers,Origin:'https://unrelated.example'},body:'{}'})).status,403);
     assert.deepEqual(await (await fetch(url+'api/matches',{headers})).json(),[]);
-    assert.deepEqual(await (await fetch(url+'api/progress',{headers})).json(),{incoming:{passed:0,total:0},outgoing:{passed:0,total:0}});
+    assert.deepEqual(await (await fetch(url+'api/paths',{headers})).json(),[]);
+    assert.deepEqual(await (await fetch(url+'api/visitors',{headers})).json(),[]);
+    assert.equal((await fetch(url+'api/candidates',{headers})).status,404);
     await fetch(url+'api/logout',{method:'POST',headers,body:'{}'});
     assert.equal((await fetch(url+'api/me',{headers})).status,401);
     const conflict=spawn(process.execPath,[script],{env:{...process.env,PORT:new URL(url).port},stdio:['ignore','ignore','pipe']});

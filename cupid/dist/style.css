@@ -196,5 +196,30 @@ dialog::backdrop{background:rgb(20 20 18 / .4)}
 .more[open]{flex-basis:100%}
 .report-form{display:grid;gap:8px;margin-top:8px;max-width:420px}
 .report-form button{justify-self:start}
-#text-answer textarea{width:100%;padding:8px 10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);resize:vertical}
 .report-form textarea{width:100%;padding:8px 10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface)}
+
+/* Paths: start on the left, the heart on the right. Hidden steps are blacked out. */
+.paths{margin:0;padding:0;list-style:none}
+.paths>li{padding:14px 0;border-bottom:1px solid var(--border)}
+.paths>li:last-child{border-bottom:0}
+.path-head{display:flex;align-items:center;gap:10px}
+.path-head>strong{margin-right:auto}
+.track{display:flex;align-items:center;padding:34px 4px 4px 0}
+.step,.goal{position:relative;display:flex;align-items:center;justify-content:center;height:14px}
+.step{flex:1;min-width:14px;max-width:72px}
+.step::before{content:'';position:absolute;left:0;right:0;top:50%;height:2px;margin-top:-1px;background:var(--border-strong)}
+.step::after{content:'';position:relative;width:12px;height:12px;border-radius:3px}
+.step.passed::before{background:var(--accent)}
+.step.passed::after{background:var(--accent)}
+.step.hidden::after{background:var(--text);opacity:.82}
+.goal{flex:none;width:30px}
+.heart{width:24px;height:auto;fill:var(--border-strong)}
+.heart.reached{fill:var(--accent)}
+.heart.faded{opacity:.4}
+.marker{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);display:flex;filter:drop-shadow(0 1px 1px rgb(0 0 0 / .15))}
+.track.ended .marker{opacity:.55}
+.path-question{margin-top:12px;padding:14px 16px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--bg)}
+.path-question h3{font-size:15px}
+.visitors{margin-bottom:16px}
+.visitors .track{padding-top:30px}
+.text-answer textarea{width:100%;padding:8px 10px;border:1px solid var(--border-strong);border-radius:var(--r-sm);background:var(--surface);resize:vertical}

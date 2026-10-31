@@ -4,6 +4,8 @@ export function migrateTree(tree){
   if(!tree||!Array.isArray(tree.nodes))return tree;
   for(const node of [...tree.nodes]){
     if(!node||typeof node!=='object')continue;
+    // Attraction ratings were removed; a number question that read them now asks the person directly.
+    if(node.source)delete node.source;
     // Number questions used to need integer ranges covering every value; branches now start at breakpoints.
     if(node.type==='scale'&&Array.isArray(node.ranges)&&node.ranges.some(r=>r&&'min' in r)){node.ranges=[...node.ranges].sort((a,b)=>a.min-b.min).map((r,i)=>({from:i?r.min:null,to:r.to??''}));node.integer=true;}
     if(node.type!=='count'||!node.items)continue;

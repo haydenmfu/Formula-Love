@@ -11,8 +11,8 @@ export function demoTree(){return {start:'kind',nodes:[
 {id:'connect',type:'terminal',label:'Worth a conversation',outcome:'match',x:330,y:785}
 ]};}
 export function initialState({demo=false}={}){const tree=demo?demoTree():{start:"",nodes:[]};return {version:1,active:'you',profiles:[
-{id:'you',name:'You',bio:'Curious about people, terrible at small talk. Usually building something or finding a new game.',publicHobbies:'Programming, hiking, sci-fi books',privateHobbies:'League of Legends, board games',answers:{kind:true,exercise_hours:5,curious:true,funny:true,ambitious:true},attraction:{alex:8},tree:migrateTree(clone(tree))},
-{id:'alex',name:'Alex',bio:'Weekend trails, cooperative games, and an unreasonable number of unfinished side projects.',publicHobbies:'Trail walking, reading fantasy, cooking',privateHobbies:'LoL, tabletop games',answers:{kind:true,exercise_hours:2.5,curious:true,funny:true,ambitious:false},attraction:{you:7},tree:migrateTree(clone(tree))}
+{id:'you',name:'You',bio:'Curious about people, terrible at small talk. Usually building something or finding a new game.',publicHobbies:'Programming, hiking, sci-fi books',privateHobbies:'League of Legends, board games',answers:{kind:true,exercise_hours:5,curious:true,funny:true,ambitious:true},tree:migrateTree(clone(tree))},
+{id:'alex',name:'Alex',bio:'Weekend trails, cooperative games, and an unreasonable number of unfinished side projects.',publicHobbies:'Trail walking, reading fantasy, cooking',privateHobbies:'LoL, tabletop games',answers:{kind:true,exercise_hours:2.5,curious:true,funny:true,ambitious:false},tree:migrateTree(clone(tree))}
 ]};}
 export const edges=flowEdges;
 export function validateTree(t,{allowUnconnected=false}={}){const e=[];migrateTree(t);if(t?.completionThreshold!==undefined&&(!Number.isInteger(t.completionThreshold)||t.completionThreshold<1||t.completionThreshold>100))return ['Completion threshold must be an integer from 1 to 100.'];if(allowUnconnected&&t&&Array.isArray(t.nodes)&&t.nodes.length===0&&t.start==='')return [];if(!t||!Array.isArray(t.nodes)||!t.nodes.length)return ['A tree needs at least one node.'];if(t.nodes.length>100)return ['Use at most 100 nodes in this prototype.'];const ids=new Set();for(const n of t.nodes){if(!n||typeof n.id!=='string'||!n.id){e.push('Every node needs a text ID.');continue}if(ids.has(n.id))e.push(`Duplicate ID: ${n.id}`);ids.add(n.id)}if(!ids.has(t.start))e.push('Choose an existing start node.');for(const n of t.nodes){if(!n||!TYPES[n.type]){e.push('Unknown node type.');continue}if(typeof n.label!=='string'||!n.label.trim())e.push(`${n.id}: add a label.`);if(!Number.isFinite(n.x)||!Number.isFinite(n.y)||n.x<0||n.y<0)e.push(`${n.id}: positions must be nonnegative numbers.`);if(['boolean','scale','category','text'].includes(n.type)&& (typeof n.key!=='string'||!n.key.trim()||['__proto__','constructor','prototype'].includes(n.key)))e.push(`${n.id}: add a valid answer key.`);
@@ -53,13 +53,13 @@ else if(['count','sum'].includes(n.type)){
     detail=values.some(v=>v===null)?'Waiting for all scalar inputs.':values.join(' + ')+' = '+total+'; must be greater than '+n.threshold+'.';
   }
 }
-else {value=n.source==='attraction'?owner.attraction[candidate.id]:candidate.answers[n.key];if(['boolean','text'].includes(n.type)&&typeof value!=='boolean')value=null;if(n.type==='scale'&&!numberOk(n,value))value=null;if(n.type==='category'&&!n.options.some(o=>o.value===value))value=null;}
+else {value=candidate.answers[n.key];if(['boolean','text'].includes(n.type)&&typeof value!=='boolean')value=null;if(n.type==='scale'&&!numberOk(n,value))value=null;if(n.type==='category'&&!n.options.some(o=>o.value===value))value=null;}
 if(value===undefined||value===null){trace.push({id:n.id,label:n.label,detail:detail||(n.type==='text'&&candidate.reviewing?.includes(n.key)?'Waiting for review.':'Not answered yet.'),pending:true});return {status:'pending',trace}}
-if(n.type==='scale'){const i=n.ranges.findLastIndex(r=>r.from===null||value>=r.from);to=n.ranges[i].to;detail=`${value} · branch ${rangeLabel(n,i)}${n.source==='attraction'?' · your appearance rating':''}`;}else if(n.type==='category'){to=n.options.find(o=>o.value===value).to;detail=value;}else{to=value?n.yes:n.no;detail=detail||(n.type==='text'?(value?'Approved':'Not approved'):(value?'Yes':'No'));}trace.push({id:n.id,label:n.label,detail,to});id=to;}
+if(n.type==='scale'){const i=n.ranges.findLastIndex(r=>r.from===null||value>=r.from);to=n.ranges[i].to;detail=`${value} · branch ${rangeLabel(n,i)}`;}else if(n.type==='category'){to=n.options.find(o=>o.value===value).to;detail=value;}else{to=value?n.yes:n.no;detail=detail||(n.type==='text'?(value?'Approved':'Not approved'):(value?'Yes':'No'));}trace.push({id:n.id,label:n.label,detail,to});id=to;}
 return {status:'invalid',trace,errors:['No outcome reached.']};}
-export function mutual(a,b){const forward=evaluate(a.tree,a,b),reverse=evaluate(b.tree,b,a);const attraction=Number(a.attraction[b.id])>=6&&Number(b.attraction[a.id])>=6;return {forward,reverse,attraction,matched:forward.status==='match'&&reverse.status==='match'&&attraction};}
+export function mutual(a,b){const forward=evaluate(a.tree,a,b),reverse=evaluate(b.tree,b,a);return {forward,reverse,matched:forward.status==='match'&&reverse.status==='match'};}
 export function questionValue(n,owner,candidate){
- const v=n.source==='attraction'?owner.attraction[candidate.id]:candidate.answers[n.key];
+ const v=candidate.answers[n.key];
  if(n.type==='boolean'||n.type==='text')return typeof v==='boolean'?v:null;
  if(n.type==='scale')return numberOk(n,v)?v:null;
  return null;
@@ -70,5 +70,5 @@ export function questionsFor(owner,candidate){
  const result=evaluate(owner.tree,owner,candidate),last=result.status==='pending'?result.trace.at(-1):null;
  const blocked=owner.tree.nodes.find(n=>n.id===last?.id),needed=new Set(blocked?.inputs||[last?.id]);
  const seen=new Set();
- return owner.tree.nodes.filter(n=>['boolean','scale','category','text'].includes(n.type)&&n.source!=='attraction').map(n=>({...n,needed:needed.has(n.id)&&questionValue(n,owner,candidate)===null})).filter(n=>{if(seen.has(n.key))return false;seen.add(n.key);return true;}).sort((a,b)=>Number(b.needed)-Number(a.needed));
+ return owner.tree.nodes.filter(n=>['boolean','scale','category','text'].includes(n.type)).map(n=>({...n,needed:needed.has(n.id)&&questionValue(n,owner,candidate)===null})).filter(n=>{if(seen.has(n.key))return false;seen.add(n.key);return true;}).sort((a,b)=>Number(b.needed)-Number(a.needed));
 }

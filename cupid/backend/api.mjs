@@ -15,12 +15,11 @@ export function apiHandler(store){
  case 'GET /api/me':result=store.me(id);break;
  case 'PUT /api/profile':result=store.saveProfile(id,body);break;
  case 'PUT /api/tree':result=store.saveTree(id,body);break;
- case 'GET /api/questions':result=store.questions(id);break;
+ case 'GET /api/questions':result=store.questions(id,url.searchParams.get('owner'));break;
  case 'POST /api/answers':result=store.answer(id,body.token,body.value);break;
- case 'GET /api/candidates':result=store.candidates(id);break;
- case 'PUT /api/rating':result=store.rate(id,body.targetId,body.score);break;
  case 'GET /api/matches':result=store.matches(id);break;
- case 'GET /api/progress':result=store.progress(id);break;
+ case 'GET /api/paths':result=store.paths(id);break;
+ case 'GET /api/visitors':result=store.visitors(id);break;
  case 'GET /api/responses/sent':result=store.sentResponses(id);break;
  case 'GET /api/responses/inbox':result=store.inbox(id);break;
  case 'POST /api/responses/decide':result=store.decide(id,body.id,body.approve);break;
